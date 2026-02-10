@@ -1,0 +1,11 @@
+diff --git a/electron-builder.yml b/electron-builder.yml
+index 0be9a29..d87fb24 100644
+--- a/electron-builder.yml
++++ b/electron-builder.yml
+@@ -1,5 +1,5 @@
+ appId: sparkle.app
+-productName: Sparkle
++productName: sparkle
+ directories:
+   buildResources: build
+ files:
