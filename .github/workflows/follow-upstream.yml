@@ -32,7 +32,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add sparkle.spec
-            git commit -m "chore: update to $upstream_latest_release"
+            git commit -m "Update to $upstream_latest_release"
             git push origin HEAD:main
           else
             echo "Already on the latest release; nothing to do."
