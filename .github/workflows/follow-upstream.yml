@@ -2,7 +2,7 @@ name: Follow Upstream Releases
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 4 */1 * *' # Every 24 hours at 4:10 AM
+    - cron: "10 4 */1 * *" # Every 24 hours at 4:10 AM
 
 jobs:
   update_on_new_release:
@@ -19,16 +19,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          upstream_latest_release=$(curl -s https://api.github.com/repos/xishang0128/sparkle/releases/latest | jq -r '.tag_name')
+          upstream_latest_release=$(curl -s https://api.github.com/repos/xishang0128/sparkle/releases/latest | jq -r '.tag_name // empty')
+          if [ -z "$upstream_latest_release" ]; then
+            echo "No tag_name found in upstream response; nothing to do."
+            exit 0
+          fi
           echo "Latest Sparkle release: $upstream_latest_release"
-        
-          rpm_latest_release=$(grep -E '^Version:\s*([^\s]*)\s*$' sparkle.spec | awk '{print $2}')
+
+          rpm_latest_release=$(grep -E '^Version:\s*\S*\s*$' sparkle.spec | awk '{print $2}')
           echo "Latest RPM package release: $rpm_latest_release"
-          
+
           if [ "$upstream_latest_release" != "$rpm_latest_release" ]; then
             echo "New release available."
             echo "Updating sparkle.spec..."
-            sed -i "s/^Version:\s*[^\s]*\s*$/Version: $upstream_latest_release/" sparkle.spec
+            sed -i "s/^Version:\s*\S*\s*$/Version: $upstream_latest_release/" sparkle.spec
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add sparkle.spec
