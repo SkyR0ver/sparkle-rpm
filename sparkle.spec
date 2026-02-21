@@ -16,8 +16,6 @@ URL: https://github.com/xishang0128/sparkle
 Source0: %{url}/archive/refs/tags/%{version}.tar.gz 
 Source1: %{name}.desktop
 
-Patch0: lowercase-name.patch
-
 BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
@@ -35,7 +33,7 @@ Requires(preun): %{_sbindir}/alternatives
 
 %build
 pnpm install
-pnpm build:linux --dir
+pnpm build:linux -c.productName sparkle --dir
 
 
 %install
