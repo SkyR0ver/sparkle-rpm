@@ -38,18 +38,18 @@ pnpm build:linux -c.productName sparkle --dir
 
 %install
 # Clean prebuilt node binaries depending on musl
-rm -r dist/linux-unpacked/resources/app.asar.unpacked/node_modules/@tailwindcss/oxide-linux-x64-musl
-rm -r dist/linux-unpacked/resources/app.asar.unpacked/node_modules/lightningcss-linux-x64-musl
+rm -r dist/linux*-unpacked/resources/app.asar.unpacked/node_modules/@tailwindcss/oxide-linux-*-musl
+rm -r dist/linux*-unpacked/resources/app.asar.unpacked/node_modules/lightningcss-linux-*-musl
 
 # Modify file modes
-chmod 4755 dist/linux-unpacked/chrome-sandbox
-chmod +sx dist/linux-unpacked/resources/sidecar/mihomo
-chmod +sx dist/linux-unpacked/resources/sidecar/mihomo-alpha
-chmod -R go-w dist/linux-unpacked/resources/files/sub-store-frontend
+chmod 4755 dist/linux*-unpacked/chrome-sandbox
+chmod +sx dist/linux*-unpacked/resources/sidecar/mihomo
+chmod +sx dist/linux*-unpacked/resources/sidecar/mihomo-alpha
+chmod -R go-w dist/linux*-unpacked/resources/files/sub-store-frontend
 
 # Install everything to /opt/sparkle
 mkdir -p %{buildroot}%{_pkgdir}
-cp -rp dist/linux-unpacked/* %{buildroot}%{_pkgdir}
+cp -rp dist/linux*-unpacked/* %{buildroot}%{_pkgdir}
 
 # Install icon
 mkdir -p %{buildroot}%{_icondir}
