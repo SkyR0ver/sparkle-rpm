@@ -20,8 +20,8 @@ BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
 
-Requires(post): %{_sbindir}/alternatives
-Requires(preun): %{_sbindir}/alternatives
+Requires(post): %{_bindir}/update-alternatives
+Requires(preun): %{_bindir}/update-alternatives
 
 %description
 %{summary}, forked from Mihomo Party by xishang0128.
@@ -63,19 +63,19 @@ install -Dp -m0644 %{SOURCE1} %{buildroot}%{_datadir}/applications/%{name}.deskt
 %post
 # Create symlink
 mkdir -p %{_bindir}
-%{_sbindir}/alternatives --install %{_bindir}/sparkle sparkle %{_pkgdir}/sparkle 100
+update-alternatives --install %{_bindir}/sparkle sparkle %{_pkgdir}/sparkle 100
 
 
 %preun
 if [ $1 -eq 0 ]; then
-    %{_sbindir}/alternatives --remove sparkle %{pkgdir}/sparkle
+    update-alternatives --remove sparkle %{_pkgdir}/sparkle
 fi
 
 
 %files
 %license LICENSE
 %{_pkgdir}
-%ghost %{_bindir}/%{name}
+%ghost %{_bindir}/sparkle
 %{_datadir}/applications/%{name}.desktop
 %{_icondir}/%{name}.png
 
