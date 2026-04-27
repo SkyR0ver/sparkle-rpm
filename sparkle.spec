@@ -37,9 +37,16 @@ pnpm build:linux -c.productName sparkle --dir
 
 
 %install
-# Clean prebuilt node binaries depending on musl
-rm -r dist/linux*-unpacked/resources/app.asar.unpacked/node_modules/@tailwindcss/oxide-linux-*-musl
-rm -r dist/linux*-unpacked/resources/app.asar.unpacked/node_modules/lightningcss-linux-*-musl
+# Clean prebuilt node binaries depending on other platforms or musl
+UNPACKED_MODULE_DIR=dist/linux*-unpacked/resources/app.asar.unpacked/node_modules
+rm -r ${UNPACKED_MODULE_DIR}/@tailwindcss/oxide-linux-*-musl
+rm -r ${UNPACKED_MODULE_DIR}/lightningcss-linux-*-musl
+%ifarch x86_64
+ARCH=x64
+%elifarch aarch64
+ARCH=arm64
+%endif
+find ${UNPACKED_MODULE_DIR}/koffi/build/koffi -mindepth 1 -maxdepth 1 -type d ! -name "linux_${ARCH}" -exec rm -r {} +
 
 # Modify file modes
 chmod 4755 dist/linux*-unpacked/chrome-sandbox
