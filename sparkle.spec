@@ -16,6 +16,9 @@ URL: https://github.com/xishang0128/sparkle
 Source0: %{url}/archive/refs/tags/%{version}.tar.gz 
 Source1: %{name}.desktop
 
+# Workaround for segmentation fault during postinstall
+Patch0: postinstall-skip-deps.patch
+
 BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
@@ -33,21 +36,12 @@ Requires(preun): %{_bindir}/update-alternatives
 
 %build
 pnpm install
+# Manually run to avoid segmentation fault
+pnpm exec electron-builder install-app-deps
 pnpm build:linux -c.productName sparkle --dir
 
 
 %install
-# Clean prebuilt node binaries depending on other platforms or musl
-UNPACKED_MODULE_DIR=dist/linux*-unpacked/resources/app.asar.unpacked/node_modules
-rm -r ${UNPACKED_MODULE_DIR}/@tailwindcss/oxide-linux-*-musl
-rm -r ${UNPACKED_MODULE_DIR}/lightningcss-linux-*-musl
-%ifarch x86_64
-ARCH=x64
-%elifarch aarch64
-ARCH=arm64
-%endif
-find ${UNPACKED_MODULE_DIR}/koffi/build/koffi -mindepth 1 -maxdepth 1 -type d ! -name "linux_${ARCH}" -exec rm -r {} +
-
 # Modify file modes
 chmod 4755 dist/linux*-unpacked/chrome-sandbox
 chmod +sx dist/linux*-unpacked/resources/sidecar/mihomo
