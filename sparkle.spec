@@ -6,7 +6,7 @@
 %global debug_package %{nil}
 
 Name: sparkle
-Version: 1.26.6
+Version: 1.26.7
 Release: %autorelease
 Summary: Another Mihimo GUI
 
