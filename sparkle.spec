@@ -19,7 +19,12 @@ Source1: %{name}.desktop
 BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
+
+%if 0%{fedora} <= 43
+BuildRequires: nodejs22-full-i18n
+%else
 BuildRequires: nodejs24-full-i18n
+%endif
 
 Requires(post): %{_bindir}/update-alternatives
 Requires(preun): %{_bindir}/update-alternatives
