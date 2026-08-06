@@ -16,12 +16,10 @@ URL: https://github.com/xishang0128/sparkle
 Source0: %{url}/archive/refs/tags/%{version}.tar.gz 
 Source1: %{name}.desktop
 
-# Workaround for segmentation fault during postinstall
-Patch0: postinstall-skip-deps.patch
-
 BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
+BuildRequires: nodejs24-full-i18n
 
 Requires(post): %{_bindir}/update-alternatives
 Requires(preun): %{_bindir}/update-alternatives
@@ -36,8 +34,9 @@ Requires(preun): %{_bindir}/update-alternatives
 
 %build
 pnpm install
-# Manually run to avoid segmentation fault
-pnpm exec electron-builder install-app-deps
+# Upstream tarball ships a stale version in package.json; align it with the
+# packaged version so the app and artifacts report the correct version.
+sed -i 's/^\([[:space:]]*"version":[[:space:]]*"\)[^"]*\("[[:space:]]*,[[:space:]]*\)$/\1%{version}\2/' package.json
 pnpm build:linux -c.productName sparkle --dir
 
 
