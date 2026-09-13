@@ -42,6 +42,9 @@ pnpm install
 # Upstream tarball ships a stale version in package.json; align it with the
 # packaged version so the app and artifacts report the correct version.
 sed -i 's/^\([[:space:]]*"version":[[:space:]]*"\)[^"]*\("[[:space:]]*,[[:space:]]*\)$/\1%{version}\2/' package.json
+# Electron 43.4.1 used by sparkle 1.26.8 uses illegal arguments when
+# registering tray icon. Later version fixed the issue.
+pnpm update electron
 pnpm build:linux -c.productName sparkle --dir
 
 
