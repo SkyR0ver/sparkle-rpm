@@ -16,6 +16,8 @@ URL: https://github.com/xishang0128/sparkle
 Source0: %{url}/archive/refs/tags/%{version}.tar.gz 
 Source1: %{name}.desktop
 
+Patch1: 0001-fix-monaco-context-menu-inert.patch
+
 BuildRequires: gcc-c++
 BuildRequires: pnpm
 BuildRequires: libxcrypt-compat
@@ -34,7 +36,7 @@ Requires(preun): %{_bindir}/update-alternatives
 
 
 %prep
-%autosetup
+%autosetup -p1
 
 
 %build

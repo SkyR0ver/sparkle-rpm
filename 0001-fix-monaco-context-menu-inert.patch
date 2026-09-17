@@ -1,0 +1,67 @@
+--- sparkle-1.26.8/src/renderer/src/components/base/base-editor.tsx	1970-01-01T00:00:01+00:00
++++ sparkle-1.26.8/src/renderer/src/components/base/base-editor.tsx	2026-09-17T08:27:35.920125+00:00
+@@ -8,6 +8,7 @@
+ import { useAppConfig } from '@renderer/hooks/use-app-config'
+ import { MonacoDiffEditor, MonacoEditor, type EditorOptions } from './monaco-editor'
+ import { configureMonacoWorkers } from './monaco-workers'
++import { keepMonacoContextViewInteractive } from '@renderer/utils/monacoContextView'
+ type Language = 'yaml' | 'javascript' | 'css' | 'json' | 'text'
+ 
+ const LONG_LINE_LIMIT = 1000
+@@ -66,6 +67,7 @@
+   if (initialized) return
+ 
+   configureMonacoWorkers()
++  keepMonacoContextViewInteractive()
+   // configure yaml worker
+   configureMonacoYaml(monaco, {
+     validate: true,
+--- sparkle-1.26.8/src/renderer/src/utils/monacoContextView.ts	1970-01-01T00:00:01+00:00
++++ sparkle-1.26.8/src/renderer/src/utils/monacoContextView.ts	2026-09-17T08:27:35.920125+00:00
+@@ -0,0 +1,46 @@
++/**
++ * Keeps Monaco's context menu interactive inside HeroUI (React Aria) modals.
++ *
++ * ariaHideOutside() marks everything outside the dialog as `inert`, including Monaco's parked
++ * context-view element; Monaco later shows that element without clearing `inert`, so the menu gets
++ * painted but no pointer events. Top-layer elements are exempt, and stale `inert` must be dropped.
++ */
++const CONTEXT_VIEW_SELECTOR = '.context-view'
++const TOP_LAYER_ATTRIBUTE = 'data-react-aria-top-layer'
++
++const makeInteractive = (element: Element): void => {
++  element.setAttribute(TOP_LAYER_ATTRIBUTE, 'true')
++  element.removeAttribute('inert')
++}
++
++const patchContextViews = (root: ParentNode): void => {
++  if (root instanceof Element && root.matches(CONTEXT_VIEW_SELECTOR)) {
++    makeInteractive(root)
++  }
++  root.querySelectorAll(CONTEXT_VIEW_SELECTOR).forEach(makeInteractive)
++}
++
++export function keepMonacoContextViewInteractive(): void {
++  patchContextViews(document)
++
++  new MutationObserver((records) => {
++    for (const record of records) {
++      if (record.type === 'attributes') {
++        if ((record.target as Element).matches(CONTEXT_VIEW_SELECTOR)) {
++          makeInteractive(record.target as Element)
++        }
++      } else {
++        record.addedNodes.forEach((node) => {
++          if (node instanceof Element) {
++            patchContextViews(node)
++          }
++        })
++      }
++    }
++  }).observe(document.documentElement, {
++    childList: true,
++    subtree: true,
++    attributes: true,
++    attributeFilter: ['inert']
++  })
++}
